@@ -13,7 +13,6 @@
   "dependencies": {
     "bergie/noflo": "*"
   },
-  "main": "dist/draggabilly.js",
   "scripts": [
     "src/draggabilly.coffee"
   ],
@@ -22,7 +21,7 @@
   ],
   "noflo": {
     "components": {
-      "Draggabilly": "dist/draggabilly.js"
+      "Draggabilly": "src/draggabilly.coffee"
     }
   }
 }

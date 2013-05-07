@@ -3,10 +3,12 @@
   "description": "Draggabilly components for the NoFlo flow-based programming environment",
   "author": "D4 Tocchini <d4@rituwall.com>",
   "version": "0.0.1",
-  "licenses": [{
-    "type": "MIT",
-    "url": "https://github.com/bergie/noflo/raw/master/LICENSE"
-  }],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/bergie/noflo/raw/master/LICENSE"
+    }
+  ],
   "engines": {
     "node": ">=0.6.0"
   },
@@ -14,7 +16,7 @@
     "noflo": "0.3.x",
     "coffee-script": "1.4.x"
   },
-  "devDependencies": {    
+  "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-coffee": "~0.6.6",
     "grunt-coffeelint": "0.0.6",
@@ -26,7 +28,8 @@
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-contrib-watch": "~0.3.1",
     "component-json": "git://github.com/CamShaft/component-json.git",
-    "grunt-component": "~0.1.2"
+    "grunt-component": "~0.1.2",
+    "grunt-combine": "~0.8.3"
   },
   "noflo": {
     "components": {

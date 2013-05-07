@@ -29,6 +29,16 @@ module.exports = ->
           json = require 'component-json'
           builder.use json()
 
+    # Fix broken Component aliases, as mentioned in
+    # https://github.com/anthonyshort/component-coffee/issues/3
+    combine:
+      browser:
+        input: 'dist/draggabilly.js'
+        output: 'dist/draggabilly.js'
+        tokens: [
+          token: '.coffee'
+          string: '.js'
+        ]
 
     # Automated recompilation and testing when developing
     watch:
@@ -50,6 +60,7 @@ module.exports = ->
   @loadNpmTasks 'grunt-contrib-coffee'
   @loadNpmTasks 'grunt-component'
   @loadNpmTasks 'grunt-component-build'
+  @loadNpmTasks 'grunt-combine'
   @loadNpmTasks 'grunt-contrib-uglify'
 
   # Grunt plugins used for testing
@@ -70,6 +81,7 @@ module.exports = ->
     if target is 'all' or target is 'browser'
       @task.run 'component'
       @task.run 'component_build'
+      @task.run 'combine'
       #@task.run 'uglify'
     
   @registerTask 'test', 'Build NoFlo and run automated tests', (target = 'all') =>
@@ -81,6 +93,7 @@ module.exports = ->
     if target is 'all' or target is 'browser'
       @task.run 'component'
       @task.run 'component_build'
+      @task.run 'combine'
       #@task.run 'mocha_phantomjs'
     
   @registerTask 'default', ['test']
