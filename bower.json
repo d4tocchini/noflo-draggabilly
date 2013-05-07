@@ -1,0 +1,7 @@
+{
+    "name":  "noflo-draggabilly",
+    "version": "0.0.1",
+    "dependencies": {
+        "draggabilly": "1.0.2"
+    }
+}

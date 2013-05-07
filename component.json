@@ -1,0 +1,28 @@
+{
+  "name": "noflo-draggabilly",
+  "description": "Draggabilly components for the NoFlo flow-based programming environment",
+  "author": "D4 Tocchini <d4@rituwall.com>",
+  "repo": "d4tocchini/noflo-draggabilly",
+  "version": "0.0.1",
+  "keywords": [
+    "fbp",
+    "drag",
+    "dnd",
+    "draggable"
+  ],
+  "dependencies": {
+    "bergie/noflo": "*"
+  },
+  "main": "dist/draggabilly.js",
+  "scripts": [
+    "src/draggabilly.coffee"
+  ],
+  "json": [
+    "component.json"
+  ],
+  "noflo": {
+    "components": {
+      "Draggabilly": "dist/draggabilly.js"
+    }
+  }
+}
