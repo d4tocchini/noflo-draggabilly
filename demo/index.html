@@ -57,7 +57,7 @@
       var graph = new noflo.Graph('Movable image');
 
       // Which component to start with when loading components
-      graph.baseDir = 'noflo';
+      graph.baseDir = 'noflo-draggabilly';
 
       // Logging
       graph.addNode('Log', 'Output');
@@ -75,7 +75,7 @@
       graph.addInitial(150, 'AnchorY', 'in');
       
       //
-      graph.addNode('Touch', 'Draggabilly');
+      graph.addNode('Touch', 'draggabilly/Draggabilly');
       /* failed attempt at subgraph
       graph.addNode('Touch', 'Graph');
       var dndGraph = new noflo.Graph('DND Subgraph');
