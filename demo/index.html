@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8">
     <title>NoFlo-Draggabilly demo</title>
-    <!--script src="../lib/noflo.js"></script-->
     <script src="../components/eventEmitter/EventEmitter.js"></script>
     <script src="../components/eventie/eventie.js"></script>
     <script src="../components/get-style-property/get-style-property.js"></script>
@@ -37,6 +36,14 @@
                 0 1px 1px hsla(220,20%,0%,.2),
                 0 3px 8px hsla(220,20%,0%,.1);
       }
+      .draggable.is-dragging {
+
+        box-shadow: 
+                0 -1px 0px hsl(220,100%,100%),
+                0 1px 1px hsla(220,20%,0%,.1),
+                0 8px 13px hsla(220,20%,0%,.2);
+        
+      }
       textarea {
         width: 596px;
         height: 400px;
@@ -53,6 +60,9 @@
     <textarea id="graph">
     </textarea>
     <script>
+    
+    window.onload = function () {
+      
       var noflo = require('noflo');
       var graph = new noflo.Graph('Movable image');
 
@@ -62,6 +72,11 @@
       // Logging
       graph.addNode('Log', 'Output');
       graph.addNode('LogSplit', 'Split');
+      
+      // Container IIP must pass before image! 
+      graph.addNode('Touch', 'draggabilly/Draggabilly');
+      graph.addNode('Container', 'GetElement');
+      graph.addInitial('.area', 'Container', 'selector'); 
 
       // The image element, selected from DOM with CSS selector
       graph.addNode('Image', 'GetElement');
@@ -74,37 +89,6 @@
       graph.addNode('AnchorY', 'Split');
       graph.addInitial(150, 'AnchorY', 'in');
       
-      //
-      graph.addNode('Touch', 'draggabilly/Draggabilly');
-      /* failed attempt at subgraph
-      graph.addNode('Touch', 'Graph');
-      var dndGraph = new noflo.Graph('DND Subgraph');
-      graph.addInitial(dndGraph, 'Touch', 'in');
-      dndGraph.addNode('Element', 'Split');
-      dndGraph.addNode('Mouse', 'ListenDrag');
-      dndGraph.addNode('Touch', 'ListenTouch');
-      dndGraph.addNode('Start', 'Merge');
-      dndGraph.addNode('MoveX', 'Merge');
-      dndGraph.addNode('MoveY', 'Merge');
-      dndGraph.addNode('End', 'Merge');
-      dndGraph.addEdge('Element', 'out', 'Mouse', 'element');
-      dndGraph.addEdge('Element', 'out', 'Touch', 'element');
-      dndGraph.addEdge('Mouse', 'start', 'Start', 'in');
-      dndGraph.addEdge('Touch', 'start', 'Start', 'in');
-      dndGraph.addEdge('Mouse', 'movex', 'MoveX', 'in');
-      dndGraph.addEdge('Touch', 'movex', 'MoveX', 'in');
-      dndGraph.addEdge('Mouse', 'movey', 'MoveY', 'in');
-      dndGraph.addEdge('Touch', 'movey', 'MoveY', 'in');
-      dndGraph.addEdge('Mouse', 'end', 'End', 'in');
-      dndGraph.addEdge('Touch', 'end', 'End', 'in');
-      //dndGraph.addExport('Element.in', 'element'); // how can I publish inports?
-      dndGraph.addExport('start.out', 'start');
-      dndGraph.addExport('movex.out', 'movex');
-      dndGraph.addExport('movey.out', 'movey');
-      dndGraph.addExport('end.out', 'end');
-      //dndGraph.createNetwork();
-      */
-      
       
       graph.addNode('DragX', 'Gate');
       graph.addNode('DragY', 'Gate');
@@ -115,8 +99,10 @@
       graph.addNode('PosX', 'Merge');
       graph.addNode('PosY', 'Merge');
       graph.addNode('Move', 'MoveElement');
-
-      // Pass the image element to nodes that need it
+      
+      
+      graph.addEdge('Container', 'element', 'Touch', 'container');
+      // Pass the image element to nodes that need it      
       graph.addEdge('Image', 'element', 'SendElement', 'in');
       graph.addEdge('SendElement', 'out', 'Touch', 'element');
       graph.addEdge('SendElement', 'out', 'Move', 'element');
@@ -124,9 +110,6 @@
       // initial left-right positioning
       graph.addEdge('AnchorX', 'out', 'PosX', 'in');
       graph.addEdge('PosX', 'out', 'Move', 'x');      
-      //graph.addEdge('PosX', 'out', 'LogSplit', 'in');
-      //graph.addEdge('LogSplit', 'out', 'Log', 'in');
-      //graph.addEdge('LogSplit', 'out', 'Move', 'x');
 
       // initial up-down positioning
       graph.addEdge('AnchorY', 'out', 'PosY', 'in');
@@ -134,7 +117,7 @@
 
       // left-right axis dragging
       graph.addEdge('Touch', 'start', 'DragX', 'open');
-      graph.addEdge('Touch', 'moveX', 'DragX', 'in');
+      //graph.addEdge('Touch', 'moveX', 'DragX', 'in'); // handled internally by Draggabilly
       graph.addEdge('Touch', 'end', 'DragX', 'close');
       graph.addEdge('DragX', 'out', 'PosX', 'in');
 
@@ -147,7 +130,7 @@
 
       // up-down axis dragging
       graph.addEdge('Touch', 'start', 'DragY', 'open');
-      graph.addEdge('Touch', 'moveY', 'DragY', 'in');
+      //graph.addEdge('Touch', 'moveY', 'DragY', 'in'); // handled internally by Draggabilly
       graph.addEdge('Touch', 'end', 'DragY', 'close');
       graph.addEdge('DragY', 'out', 'PosY', 'in');
 
@@ -161,11 +144,12 @@
       // write graph JSON to textarea
       var g = document.getElementById('graph');
       g.value = JSON.stringify(graph.toJSON(), null, 2);
-
+      
       // run the graph
       noflo.createNetwork(graph, function (network) {
         console.log("Network created");
       });
+    };
     </script>
   </body>
 </html>

@@ -2552,7 +2552,7 @@ ComponentLoader = (function() {
       return;
     }
     for (dependency in definition.dependencies) {
-      this.getModuleComponents(dependency);
+      this.getModuleComponents(dependency.replace('/', '-'));
     }
     if (!definition.noflo) {
       return;
@@ -4174,10 +4174,10 @@ exports.getComponent = function() {
 
 });
 require.register("bergie-noflo/component.json", function(exports, require, module){
-module.exports = JSON.parse('{"name":"noflo","description":"Flow-Based Programming environment for JavaScript","keywords":["fbp","workflow","flow"],"repo":"bergie/noflo","version":"0.3.3","dependencies":{"component/emitter":"*","component/underscore":"*"},"development":{},"license":"MIT","main":"src/lib/NoFlo.js","scripts":["src/lib/Graph.coffee","src/lib/InternalSocket.coffee","src/lib/Port.coffee","src/lib/ArrayPort.coffee","src/lib/Component.coffee","src/lib/AsyncComponent.coffee","src/lib/LoggingComponent.coffee","src/lib/ComponentLoader.coffee","src/lib/NoFlo.coffee","src/lib/Network.coffee","src/components/GetElement.coffee","src/components/MoveElement.coffee","src/components/ListenTouch.coffee","src/components/ListenDrag.coffee","src/components/ListenMouse.coffee","src/components/Spring.coffee","src/components/Callback.coffee","src/components/Kick.coffee","src/components/Gate.coffee","src/components/Split.coffee","src/components/Merge.coffee","src/components/Graph.coffee","src/components/Output.coffee"],"json":["component.json"],"noflo":{"components":{"GetElement":"src/components/GetElement.js","MoveElement":"src/components/MoveElement.js","ListenTouch":"src/components/ListenTouch.js","ListenDrag":"src/components/ListenDrag.js","ListenMouse":"src/components/ListenMouse.js","Spring":"src/components/Spring.js","Callback":"src/components/Callback.js","Kick":"src/components/Kick.js","Gate":"src/components/Gate.js","Split":"src/components/Split.js","Merge":"src/components/Merge.js","Graph":"src/components/Graph.js","Output":"src/components/Output.js"}}}');
+module.exports = JSON.parse('{"name":"noflo","description":"Flow-Based Programming environment for JavaScript","keywords":["fbp","workflow","flow"],"repo":"bergie/noflo","version":"0.3.3","dependencies":{"component/emitter":"*","component/underscore":"*"},"development":{},"license":"MIT","main":"src/lib/NoFlo.js","scripts":["src/lib/Graph.js","src/lib/InternalSocket.js","src/lib/Port.js","src/lib/ArrayPort.js","src/lib/Component.js","src/lib/AsyncComponent.js","src/lib/LoggingComponent.js","src/lib/ComponentLoader.js","src/lib/NoFlo.js","src/lib/Network.js","src/components/GetElement.js","src/components/MoveElement.js","src/components/ListenTouch.js","src/components/ListenDrag.js","src/components/ListenMouse.js","src/components/Spring.js","src/components/Callback.js","src/components/Kick.js","src/components/Gate.js","src/components/Split.js","src/components/Merge.js","src/components/Graph.js","src/components/Output.js"],"json":["component.json"],"noflo":{"components":{"GetElement":"src/components/GetElement.js","MoveElement":"src/components/MoveElement.js","ListenTouch":"src/components/ListenTouch.js","ListenDrag":"src/components/ListenDrag.js","ListenMouse":"src/components/ListenMouse.js","Spring":"src/components/Spring.js","Callback":"src/components/Callback.js","Kick":"src/components/Kick.js","Gate":"src/components/Gate.js","Split":"src/components/Split.js","Merge":"src/components/Merge.js","Graph":"src/components/Graph.js","Output":"src/components/Output.js"}}}');
 });
 require.register("noflo-draggabilly/src/draggabilly.js", function(exports, require, module){
-var Draggabilly, noflo,
+var NoFloDraggabilly, noflo,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -4192,18 +4192,22 @@ else
 */
 
 
-Draggabilly = (function(_super) {
-  __extends(Draggabilly, _super);
+NoFloDraggabilly = (function(_super) {
+  __extends(NoFloDraggabilly, _super);
 
-  Draggabilly.prototype.description = 'Make shiz draggable';
+  NoFloDraggabilly.prototype.description = 'Make shiz draggable';
 
-  function Draggabilly() {
+  function NoFloDraggabilly() {
     this.dragend = __bind(this.dragend, this);
     this.dragmove = __bind(this.dragmove, this);
     this.dragstart = __bind(this.dragstart, this);
+    this.subscribe = __bind(this.subscribe, this);
     var _this = this;
 
+    this.options = {};
     this.inPorts = {
+      container: new noflo.Port('object'),
+      options: new noflo.Port,
       element: new noflo.Port('object')
     };
     this.outPorts = {
@@ -4212,34 +4216,58 @@ Draggabilly = (function(_super) {
       moveY: new noflo.ArrayPort('number'),
       end: new noflo.ArrayPort('object')
     };
+    this.inPorts.container.on("data", function(data) {
+      return _this.setOptions({
+        containment: data
+      });
+    });
+    this.inPorts.options.on("data", function(data) {
+      return _this.setOptions(data);
+    });
     this.inPorts.element.on('data', function(element) {
       return _this.subscribe(element);
     });
   }
 
-  Draggabilly.prototype.subscribe = function(element) {
-    return element.addEventListener('dragstart', this.dragstart, false);
+  NoFloDraggabilly.prototype.subscribe = function(element) {
+    var draggie;
+
+    console.log(this.options);
+    draggie = this.draggie = new Draggabilly(element, this.options);
+    draggie.on('dragStart', this.dragstart);
+    draggie.on('dragMove', this.dragmove);
+    return draggie.on('dragEnd', this.dragend);
   };
 
-  Draggabilly.prototype.dragstart = function(event) {
-    event.preventDefault();
-    event.stopPropagation();
+  NoFloDraggabilly.prototype.setOptions = function(options) {
+    var key, value, _results;
+
+    console.log(options);
+    if (typeof options !== "object") {
+      throw new Error("Options is not an object");
+    }
+    _results = [];
+    for (key in options) {
+      if (!__hasProp.call(options, key)) continue;
+      value = options[key];
+      _results.push(this.options[key] = value);
+    }
+    return _results;
+  };
+
+  NoFloDraggabilly.prototype.dragstart = function(draggie, event, pointer) {
     this.outPorts.start.send(event);
     this.outPorts.start.disconnect();
-    window.addEventListener('mousemove', this.dragmove, false);
-    return window.addEventListener('mouseup', this.dragend, false);
+    this.outPorts.moveX.send(draggie.position.x);
+    return this.outPorts.moveY.send(draggie.position.y);
   };
 
-  Draggabilly.prototype.dragmove = function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.outPorts.moveX.send(event.clientX);
-    return this.outPorts.moveY.send(event.clientY);
+  NoFloDraggabilly.prototype.dragmove = function(draggie, event, pointer) {
+    this.outPorts.moveX.send(draggie.position.x);
+    return this.outPorts.moveY.send(draggie.position.y);
   };
 
-  Draggabilly.prototype.dragend = function(event) {
-    event.preventDefault();
-    event.stopPropagation();
+  NoFloDraggabilly.prototype.dragend = function(draggie, event, pointer) {
     if (this.outPorts.moveX.isConnected()) {
       this.outPorts.moveX.disconnect();
     }
@@ -4247,46 +4275,44 @@ Draggabilly = (function(_super) {
       this.outPorts.moveY.disconnect();
     }
     this.outPorts.end.send(event);
-    this.outPorts.end.disconnect();
-    window.removeEventListener('mousemove', this.dragmove, false);
-    return window.removeEventListener('mouseup', this.dragend, false);
+    return this.outPorts.end.disconnect();
   };
 
-  return Draggabilly;
+  return NoFloDraggabilly;
 
 })(noflo.Component);
 
 exports.getComponent = function() {
-  return new Draggabilly;
+  return new NoFloDraggabilly;
 };
 
 });
 require.register("noflo-draggabilly/component.json", function(exports, require, module){
-module.exports = JSON.parse('{"name":"noflo-draggabilly","description":"Draggabilly components for the NoFlo flow-based programming environment","author":"D4 Tocchini <d4@rituwall.com>","repo":"d4tocchini/noflo-draggabilly","version":"0.0.1","keywords":["fbp","drag","dnd","draggable"],"dependencies":{"bergie/noflo":"*"},"main":"dist/draggabilly.js","scripts":["src/draggabilly.js"],"json":["component.json"],"noflo":{"components":{"Draggabilly":"dist/draggabilly.js"}}}');
+module.exports = JSON.parse('{"name":"noflo-draggabilly","description":"Draggabilly components for the NoFlo flow-based programming environment","author":"D4 Tocchini <d4@rituwall.com>","repo":"d4tocchini/noflo-draggabilly","version":"0.0.1","keywords":["fbp","drag","dnd","draggable"],"dependencies":{"bergie/noflo":"*"},"scripts":["src/draggabilly.js"],"json":["component.json"],"noflo":{"components":{"Draggabilly":"src/draggabilly.js"}}}');
 });
-require.alias("bergie-noflo/src/lib/Graph.coffee", "noflo-draggabilly/deps/noflo/src/lib/Graph.coffee");
-require.alias("bergie-noflo/src/lib/InternalSocket.coffee", "noflo-draggabilly/deps/noflo/src/lib/InternalSocket.coffee");
-require.alias("bergie-noflo/src/lib/Port.coffee", "noflo-draggabilly/deps/noflo/src/lib/Port.coffee");
-require.alias("bergie-noflo/src/lib/ArrayPort.coffee", "noflo-draggabilly/deps/noflo/src/lib/ArrayPort.coffee");
-require.alias("bergie-noflo/src/lib/Component.coffee", "noflo-draggabilly/deps/noflo/src/lib/Component.coffee");
-require.alias("bergie-noflo/src/lib/AsyncComponent.coffee", "noflo-draggabilly/deps/noflo/src/lib/AsyncComponent.coffee");
-require.alias("bergie-noflo/src/lib/LoggingComponent.coffee", "noflo-draggabilly/deps/noflo/src/lib/LoggingComponent.coffee");
-require.alias("bergie-noflo/src/lib/ComponentLoader.coffee", "noflo-draggabilly/deps/noflo/src/lib/ComponentLoader.coffee");
-require.alias("bergie-noflo/src/lib/NoFlo.coffee", "noflo-draggabilly/deps/noflo/src/lib/NoFlo.coffee");
-require.alias("bergie-noflo/src/lib/Network.coffee", "noflo-draggabilly/deps/noflo/src/lib/Network.coffee");
-require.alias("bergie-noflo/src/components/GetElement.coffee", "noflo-draggabilly/deps/noflo/src/components/GetElement.coffee");
-require.alias("bergie-noflo/src/components/MoveElement.coffee", "noflo-draggabilly/deps/noflo/src/components/MoveElement.coffee");
-require.alias("bergie-noflo/src/components/ListenTouch.coffee", "noflo-draggabilly/deps/noflo/src/components/ListenTouch.coffee");
-require.alias("bergie-noflo/src/components/ListenDrag.coffee", "noflo-draggabilly/deps/noflo/src/components/ListenDrag.coffee");
-require.alias("bergie-noflo/src/components/ListenMouse.coffee", "noflo-draggabilly/deps/noflo/src/components/ListenMouse.coffee");
-require.alias("bergie-noflo/src/components/Spring.coffee", "noflo-draggabilly/deps/noflo/src/components/Spring.coffee");
-require.alias("bergie-noflo/src/components/Callback.coffee", "noflo-draggabilly/deps/noflo/src/components/Callback.coffee");
-require.alias("bergie-noflo/src/components/Kick.coffee", "noflo-draggabilly/deps/noflo/src/components/Kick.coffee");
-require.alias("bergie-noflo/src/components/Gate.coffee", "noflo-draggabilly/deps/noflo/src/components/Gate.coffee");
-require.alias("bergie-noflo/src/components/Split.coffee", "noflo-draggabilly/deps/noflo/src/components/Split.coffee");
-require.alias("bergie-noflo/src/components/Merge.coffee", "noflo-draggabilly/deps/noflo/src/components/Merge.coffee");
-require.alias("bergie-noflo/src/components/Graph.coffee", "noflo-draggabilly/deps/noflo/src/components/Graph.coffee");
-require.alias("bergie-noflo/src/components/Output.coffee", "noflo-draggabilly/deps/noflo/src/components/Output.coffee");
+require.alias("bergie-noflo/src/lib/Graph.js", "noflo-draggabilly/deps/noflo/src/lib/Graph.js");
+require.alias("bergie-noflo/src/lib/InternalSocket.js", "noflo-draggabilly/deps/noflo/src/lib/InternalSocket.js");
+require.alias("bergie-noflo/src/lib/Port.js", "noflo-draggabilly/deps/noflo/src/lib/Port.js");
+require.alias("bergie-noflo/src/lib/ArrayPort.js", "noflo-draggabilly/deps/noflo/src/lib/ArrayPort.js");
+require.alias("bergie-noflo/src/lib/Component.js", "noflo-draggabilly/deps/noflo/src/lib/Component.js");
+require.alias("bergie-noflo/src/lib/AsyncComponent.js", "noflo-draggabilly/deps/noflo/src/lib/AsyncComponent.js");
+require.alias("bergie-noflo/src/lib/LoggingComponent.js", "noflo-draggabilly/deps/noflo/src/lib/LoggingComponent.js");
+require.alias("bergie-noflo/src/lib/ComponentLoader.js", "noflo-draggabilly/deps/noflo/src/lib/ComponentLoader.js");
+require.alias("bergie-noflo/src/lib/NoFlo.js", "noflo-draggabilly/deps/noflo/src/lib/NoFlo.js");
+require.alias("bergie-noflo/src/lib/Network.js", "noflo-draggabilly/deps/noflo/src/lib/Network.js");
+require.alias("bergie-noflo/src/components/GetElement.js", "noflo-draggabilly/deps/noflo/src/components/GetElement.js");
+require.alias("bergie-noflo/src/components/MoveElement.js", "noflo-draggabilly/deps/noflo/src/components/MoveElement.js");
+require.alias("bergie-noflo/src/components/ListenTouch.js", "noflo-draggabilly/deps/noflo/src/components/ListenTouch.js");
+require.alias("bergie-noflo/src/components/ListenDrag.js", "noflo-draggabilly/deps/noflo/src/components/ListenDrag.js");
+require.alias("bergie-noflo/src/components/ListenMouse.js", "noflo-draggabilly/deps/noflo/src/components/ListenMouse.js");
+require.alias("bergie-noflo/src/components/Spring.js", "noflo-draggabilly/deps/noflo/src/components/Spring.js");
+require.alias("bergie-noflo/src/components/Callback.js", "noflo-draggabilly/deps/noflo/src/components/Callback.js");
+require.alias("bergie-noflo/src/components/Kick.js", "noflo-draggabilly/deps/noflo/src/components/Kick.js");
+require.alias("bergie-noflo/src/components/Gate.js", "noflo-draggabilly/deps/noflo/src/components/Gate.js");
+require.alias("bergie-noflo/src/components/Split.js", "noflo-draggabilly/deps/noflo/src/components/Split.js");
+require.alias("bergie-noflo/src/components/Merge.js", "noflo-draggabilly/deps/noflo/src/components/Merge.js");
+require.alias("bergie-noflo/src/components/Graph.js", "noflo-draggabilly/deps/noflo/src/components/Graph.js");
+require.alias("bergie-noflo/src/components/Output.js", "noflo-draggabilly/deps/noflo/src/components/Output.js");
 require.alias("bergie-noflo/src/lib/NoFlo.js", "noflo-draggabilly/deps/noflo/index.js");
 require.alias("bergie-noflo/src/lib/NoFlo.js", "noflo/index.js");
 require.alias("component-emitter/index.js", "bergie-noflo/deps/emitter/index.js");
@@ -4295,6 +4321,4 @@ require.alias("component-indexof/index.js", "component-emitter/deps/indexof/inde
 require.alias("component-underscore/index.js", "bergie-noflo/deps/underscore/index.js");
 
 require.alias("bergie-noflo/src/lib/NoFlo.js", "bergie-noflo/index.js");
-
-require.alias("noflo-draggabilly/dist/draggabilly.js", "noflo-draggabilly/index.js");
 
