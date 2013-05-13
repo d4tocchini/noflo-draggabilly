@@ -13,7 +13,7 @@
   "dependencies": {
     "bergie/noflo": "*"
   },
-  "scripts": [
+  "scripts": [    
     "src/draggabilly.coffee"
   ],
   "json": [

@@ -17,6 +17,7 @@ module.exports = ->
       install:
         options:
           action: 'install'
+          
     component_build:
       draggabilly:
         output: './dist/'
@@ -39,7 +40,30 @@ module.exports = ->
           token: '.coffee'
           string: '.js'
         ]
-
+    
+    # Copy Files to ../gh-pages
+    # assumes directory structure: 
+    # - PROJECT
+    # -- BRANCHES...
+    copy: 
+      'gh-pages': 
+        files: [
+          src: ['dist/**','demo/**','bower_components/**'], dest: '_gh-pages/'
+        ]
+          
+    
+    ### BROKEN grunt plugin, looks for component.json not bower.json
+    bowerful:
+      dist:
+        store: 'components_bower' # path where bower components are installed
+        dest: 'dist' # directory where files will be merged. Merged files take the form
+        destfile: '_bower'
+        packages: 
+          "draggabilly": "1.0.2"
+    ###
+      
+        
+    
     # Automated recompilation and testing when developing
     watch:
       files: ['test/*.coffee', 'src/**/*.coffee']
@@ -62,6 +86,8 @@ module.exports = ->
   @loadNpmTasks 'grunt-component-build'
   @loadNpmTasks 'grunt-combine'
   @loadNpmTasks 'grunt-contrib-uglify'
+  #@loadNpmTasks 'grunt-bowerful'
+  @loadNpmTasks('grunt-contrib-copy')
 
   # Grunt plugins used for testing
   @loadNpmTasks 'grunt-contrib-watch'
@@ -82,6 +108,8 @@ module.exports = ->
       @task.run 'component'
       @task.run 'component_build'
       @task.run 'combine'
+      @task.run 'copy'
+      
       #@task.run 'uglify'
     
   @registerTask 'test', 'Build NoFlo and run automated tests', (target = 'all') =>
@@ -94,6 +122,7 @@ module.exports = ->
       @task.run 'component'
       @task.run 'component_build'
       @task.run 'combine'
+      @task.run 'copy'
       #@task.run 'mocha_phantomjs'
     
   @registerTask 'default', ['test']

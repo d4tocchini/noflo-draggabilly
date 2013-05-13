@@ -7,7 +7,9 @@ else
 ###
 
 class NoFloDraggabilly extends noflo.Component
+  
   description: 'Make shiz draggable'
+  
   constructor: ->
     @options = {}
       
@@ -16,13 +18,12 @@ class NoFloDraggabilly extends noflo.Component
       options: new noflo.Port
       element: new noflo.Port 'object'
       #enable
+      
     @outPorts =
       start: new noflo.ArrayPort 'object'
       moveX: new noflo.ArrayPort 'number'
-      moveY: new noflo.ArrayPort 'number'
-      end: new noflo.ArrayPort 'object'
-    
-    
+      moveY: new noflo.ArrayPort 'number' 
+      end: new noflo.ArrayPort 'object'        
       
     @inPorts.container.on "data", (data) =>
       @setOptions {containment:data}

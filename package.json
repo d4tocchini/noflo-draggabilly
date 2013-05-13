@@ -29,7 +29,8 @@
     "grunt-contrib-watch": "~0.3.1",
     "component-json": "git://github.com/CamShaft/component-json.git",
     "grunt-component": "~0.1.2",
-    "grunt-combine": "~0.8.3"
+    "grunt-combine": "~0.8.3",
+    "grunt-contrib-copy": "0.4.1"
   },
   "noflo": {
     "components": {
