@@ -13,7 +13,7 @@ class NoFloDraggabilly extends noflo.Component
   constructor: ->
     @options = {}
       
-    @inPorts =      
+    @inPorts =
       container: new noflo.Port 'object'
       options: new noflo.Port
       element: new noflo.Port 'object'
@@ -21,9 +21,9 @@ class NoFloDraggabilly extends noflo.Component
       
     @outPorts =
       start: new noflo.ArrayPort 'object'
-      moveX: new noflo.ArrayPort 'number'
-      moveY: new noflo.ArrayPort 'number' 
-      end: new noflo.ArrayPort 'object'        
+      movex: new noflo.ArrayPort 'number'
+      movey: new noflo.ArrayPort 'number'
+      end: new noflo.ArrayPort 'object'
       
     @inPorts.container.on "data", (data) =>
       @setOptions {containment:data}
@@ -52,16 +52,16 @@ class NoFloDraggabilly extends noflo.Component
     @outPorts.start.send event
     @outPorts.start.disconnect()
     # 
-    @outPorts.moveX.send draggie.position.x
-    @outPorts.moveY.send draggie.position.y
+    @outPorts.movex.send draggie.position.x
+    @outPorts.movey.send draggie.position.y
     
   dragmove: (draggie, event, pointer) =>
-    @outPorts.moveX.send draggie.position.x #pointer.pageX
-    @outPorts.moveY.send draggie.position.y #pointer.pageY
+    @outPorts.movex.send draggie.position.x #pointer.pageX
+    @outPorts.movey.send draggie.position.y #pointer.pageY
 
   dragend: (draggie, event, pointer) =>
-    @outPorts.moveX.disconnect() if @outPorts.moveX.isConnected()
-    @outPorts.moveY.disconnect() if @outPorts.moveY.isConnected()
+    @outPorts.movex.disconnect() if @outPorts.movex.isConnected()
+    @outPorts.movey.disconnect() if @outPorts.movey.isConnected()
 
     @outPorts.end.send event
     @outPorts.end.disconnect()
