@@ -66,7 +66,7 @@ module.exports = ->
     
     # Automated recompilation and testing when developing
     watch:
-      files: ['test/*.coffee', 'src/**/*.coffee']
+      files: ['test/*.coffee', 'components/*.coffee']
       tasks: ['test']
 
     # Release automation

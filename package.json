@@ -32,11 +32,6 @@
     "grunt-combine": "~0.8.3",
     "grunt-contrib-copy": "0.4.1"
   },
-  "noflo": {
-    "components": {
-      "Draggabilly": "./src/draggabilly.coffee"
-    }
-  },
   "scripts": {
     "pretest": "./node_modules/.bin/coffeelint -r components",
     "test": "./node_modules/.bin/nodeunit test"

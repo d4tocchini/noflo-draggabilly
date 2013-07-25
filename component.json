@@ -14,7 +14,7 @@
     "noflo/noflo": "*"
   },
   "scripts": [    
-    "src/draggabilly.coffee",
+    "components/Draggabilly.coffee",
     "index.js"
   ],
   "json": [
@@ -22,7 +22,7 @@
   ],
   "noflo": {
     "components": {
-      "Draggabilly": "src/draggabilly.coffee"
+      "Draggabilly": "components/Draggabilly.coffee"
     }
   }
 }
