@@ -11,7 +11,7 @@
     "draggable"
   ],
   "dependencies": {
-    "bergie/noflo": "*"
+    "noflo/noflo": "*"
   },
   "scripts": [    
     "src/draggabilly.coffee"
