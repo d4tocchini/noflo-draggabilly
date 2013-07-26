@@ -35,9 +35,8 @@ class NoFloDraggabilly extends noflo.Component
       @subscribe element
     
     
-  subscribe: (element) => 
-    console.log @options   
-    draggie = @draggie = new Draggabilly element, @options 
+  subscribe: (element) =>
+    draggie = @draggie = new Draggabilly element, @options
     draggie.on 'dragStart', @dragstart
     draggie.on 'dragMove', @dragmove
     draggie.on 'dragEnd', @dragend
