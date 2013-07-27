@@ -42,7 +42,6 @@ class NoFloDraggabilly extends noflo.Component
     draggie.on 'dragEnd', @dragend
   
   setOptions: (options) ->
-    console.log options
     throw new Error "Options is not an object" unless typeof options is "object"
     for own key, value of options
       @options[key] = value
